@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="한글 쓰기">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>한글 쓰기 연습</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 홈 화면 -->
+  <div id="home-screen" class="screen active">
+    <h1 class="app-title">한글 쓰기 연습</h1>
+    <p class="app-subtitle">글자를 따라 써 보자! ✏️</p>
+    <div class="category-grid">
+      <button class="category-btn" data-category="consonants" style="background: #FF6B6B;">
+        <span class="category-icon">ㄱㄴㄷ</span>
+        <span class="category-label">자음</span>
+      </button>
+      <button class="category-btn" data-category="vowels" style="background: #4ECDC4;">
+        <span class="category-icon">ㅏㅑㅓ</span>
+        <span class="category-label">모음</span>
+      </button>
+      <button class="category-btn" data-category="words" style="background: #45B7D1;">
+        <span class="category-icon">가나다</span>
+        <span class="category-label">단어</span>
+      </button>
+      <button class="category-btn" data-category="sentences" style="background: #F7DC6F;">
+        <span class="category-icon">문장</span>
+        <span class="category-label">문장 쓰기</span>
+      </button>
+      <button class="category-btn" data-category="countries" style="background: #E17055;">
+        <span class="category-icon">🌍</span>
+        <span class="category-label">나라 이름</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 글자 선택 화면 -->
+  <div id="select-screen" class="screen">
+    <div class="top-bar">
+      <button id="back-to-home" class="nav-btn back-btn">← 돌아가기</button>
+      <h2 id="select-title" class="screen-title">자음</h2>
+    </div>
+    <div id="char-grid" class="char-grid"></div>
+  </div>
+
+  <!-- 쓰기 연습 화면 -->
+  <div id="practice-screen" class="screen">
+    <div class="top-bar">
+      <button id="back-to-select" class="nav-btn back-btn">← 목록</button>
+      <span id="practice-progress" class="progress-text"></span>
+    </div>
+    <div class="practice-area">
+      <div class="guide-container">
+        <span id="guide-char" class="guide-char"></span>
+        <canvas id="draw-canvas"></canvas>
+      </div>
+      <div class="practice-controls">
+        <button id="prev-btn" class="control-btn" style="background: #A29BFE;">◀ 이전</button>
+        <button id="clear-btn" class="control-btn" style="background: #FD79A8;">🗑 지우기</button>
+        <button id="sound-btn" class="control-btn" style="background: #FDCB6E;">🔊 듣기</button>
+        <button id="check-btn" class="control-btn" style="background: #6C5CE7;">✔ 확인</button>
+        <button id="next-btn" class="control-btn" style="background: #00B894;">다음 ▶</button>
+      </div>
+      <div id="score-display" class="score-display"></div>
+      <div id="encouragement" class="encouragement"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head><title>아이콘 생성</title></head>
+<body>
+<p>아래 이미지를 각각 우클릭 → 이미지 저장해서 icon-192.png, icon-512.png로 저장하세요.</p>
+<h3>192x192</h3>
+<canvas id="c192" width="192" height="192"></canvas>
+<h3>512x512</h3>
+<canvas id="c512" width="512" height="512"></canvas>
+<script>
+function drawIcon(canvasId, size) {
+  const c = document.getElementById(canvasId);
+  const ctx = c.getContext('2d');
+  // 배경
+  ctx.fillStyle = '#FF6B6B';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, size, size, size * 0.2);
+  ctx.fill();
+  // 글자
+  ctx.fillStyle = 'white';
+  ctx.font = `bold ${size * 0.5}px -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('ㄱㄴ', size/2, size/2);
+}
+drawIcon('c192', 192);
+drawIcon('c512', 512);
+
+// 자동으로 PNG 다운로드 링크 생성
+['c192','c512'].forEach(id => {
+  const c = document.getElementById(id);
+  const link = document.createElement('a');
+  const size = id === 'c192' ? 192 : 512;
+  link.download = `icon-${size}.png`;
+  link.href = c.toDataURL('image/png');
+  link.textContent = ` [icon-${size}.png 다운로드]`;
+  c.parentElement.insertBefore(link, c.nextSibling);
+});
+</script>
+</body>
+</html>
