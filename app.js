@@ -685,7 +685,37 @@ document.body.addEventListener('touchmove', (e) => {
   }
 }, { passive: false });
 
-// ===== 서비스 워커 등록 =====
+// ===== 서비스 워커 등록 (자동 업데이트) =====
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  // sw.js 자체는 캐시 안하고 항상 최신으로 체크
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+    .then((registration) => {
+      // 새 서비스워커가 감지되면 설치 완료 후 교체
+      registration.addEventListener('updatefound', () => {
+        const newSW = registration.installing;
+        if (!newSW) return;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // 새 버전 설치됨 - 바로 활성화 요청
+            newSW.postMessage('SKIP_WAITING');
+          }
+        });
+      });
+
+      // 앱이 포커스될 때마다 업데이트 체크 (홈화면 앱에 중요)
+      const checkForUpdate = () => registration.update().catch(() => {});
+      window.addEventListener('focus', checkForUpdate);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') checkForUpdate();
+      });
+    })
+    .catch(() => {});
+
+  // 새 서비스워커가 페이지를 장악하면 자동 새로고침
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
 }
