@@ -91,10 +91,17 @@ let lastX = 0;
 let lastY = 0;
 let currentColor = '#2D3436';
 let isErasing = false;
+let eraserSize = 30;
 
 const PEN_COLORS = [
   '#2D3436', '#FF6B6B', '#FDCB6E', '#00B894',
   '#0984E3', '#6C5CE7', '#E84393', '#E17055'
+];
+
+const ERASER_SIZES = [
+  { size: 15, preview: 10, label: '작게' },
+  { size: 30, preview: 18, label: '중간' },
+  { size: 55, preview: 28, label: '크게' }
 ];
 
 // ===== DOM 요소 =====
@@ -460,7 +467,7 @@ function getPos(e) {
 function applyStrokeMode() {
   if (isErasing) {
     ctx.globalCompositeOperation = 'destination-out';
-    ctx.lineWidth = 30;
+    ctx.lineWidth = eraserSize;
   } else {
     ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = currentColor;
@@ -477,13 +484,16 @@ function startDrawing(e) {
   lastY = pos.y;
   ctx.beginPath();
   ctx.moveTo(pos.x, pos.y);
+  showEraserCursorAt(pos.x, pos.y);
 }
 
 function draw(e) {
   e.preventDefault();
-  if (!isDrawing) return;
 
   const pos = getPos(e);
+  showEraserCursorAt(pos.x, pos.y);
+
+  if (!isDrawing) return;
 
   ctx.beginPath();
   ctx.moveTo(lastX, lastY);
@@ -499,6 +509,10 @@ function stopDrawing(e) {
   if (isDrawing) {
     isDrawing = false;
   }
+  // 터치 이벤트면 떼는 순간 커서 숨김 (마우스는 mouseleave에서 처리)
+  if (e && e.type && e.type.startsWith('touch')) {
+    hideEraserCursor();
+  }
 }
 
 // 터치 이벤트
@@ -511,7 +525,7 @@ canvas.addEventListener('touchcancel', stopDrawing, { passive: false });
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', stopDrawing);
-canvas.addEventListener('mouseleave', stopDrawing);
+canvas.addEventListener('mouseleave', (e) => { stopDrawing(e); hideEraserCursor(); });
 
 // ===== 소리 (TTS + 효과음) =====
 let koreanVoice = null;
@@ -649,21 +663,58 @@ document.getElementById('back-to-select').addEventListener('click', () => {
       isErasing = false;
       ctx.strokeStyle = color;
       selectTool(dot);
+      hideEraserCursor();
     });
     palette.appendChild(dot);
   });
 
-  // 지우개 버튼
-  const eraser = document.createElement('button');
-  eraser.className = 'eraser-dot';
-  eraser.textContent = '🧼';
-  eraser.title = '지우개';
-  eraser.addEventListener('click', () => {
-    isErasing = true;
-    selectTool(eraser);
+  // 구분선
+  const divider = document.createElement('span');
+  divider.className = 'palette-divider';
+  palette.appendChild(divider);
+
+  // 지우개 버튼 3개 (작게/중간/크게)
+  ERASER_SIZES.forEach(({ size, preview, label }) => {
+    const eraser = document.createElement('button');
+    eraser.className = 'eraser-dot';
+    eraser.title = `지우개 (${label})`;
+    const inner = document.createElement('span');
+    inner.className = 'eraser-preview';
+    inner.style.width = preview + 'px';
+    inner.style.height = preview + 'px';
+    eraser.appendChild(inner);
+
+    eraser.addEventListener('click', () => {
+      isErasing = true;
+      eraserSize = size;
+      selectTool(eraser);
+      updateEraserCursor();
+    });
+    palette.appendChild(eraser);
   });
-  palette.appendChild(eraser);
 })();
+
+// ===== 지우개 원형 커서 =====
+const eraserCursor = document.createElement('div');
+eraserCursor.className = 'eraser-cursor';
+eraserCursor.style.display = 'none';
+document.querySelector('.guide-container').appendChild(eraserCursor);
+
+function updateEraserCursor() {
+  eraserCursor.style.width = eraserSize + 'px';
+  eraserCursor.style.height = eraserSize + 'px';
+}
+
+function showEraserCursorAt(x, y) {
+  if (!isErasing) return;
+  eraserCursor.style.display = 'block';
+  eraserCursor.style.left = x + 'px';
+  eraserCursor.style.top = y + 'px';
+}
+
+function hideEraserCursor() {
+  eraserCursor.style.display = 'none';
+}
 
 // ===== 화면 크기 변경 대응 =====
 window.addEventListener('resize', () => {
