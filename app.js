@@ -90,6 +90,7 @@ let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
 let currentColor = '#2D3436';
+let isErasing = false;
 
 const PEN_COLORS = [
   '#2D3436', '#FF6B6B', '#FDCB6E', '#00B894',
@@ -456,9 +457,21 @@ function getPos(e) {
   };
 }
 
+function applyStrokeMode() {
+  if (isErasing) {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineWidth = 30;
+  } else {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = 8;
+  }
+}
+
 function startDrawing(e) {
   e.preventDefault();
   isDrawing = true;
+  applyStrokeMode();
   const pos = getPos(e);
   lastX = pos.x;
   lastY = pos.y;
@@ -618,21 +631,38 @@ document.getElementById('back-to-select').addEventListener('click', () => {
   showScreen('select');
 });
 
-// ===== 색상 팔레트 생성 =====
+// ===== 색상 팔레트 + 지우개 생성 =====
 (function initColorPalette() {
   const palette = document.getElementById('color-palette');
+
+  function selectTool(button) {
+    palette.querySelectorAll('.color-dot, .eraser-dot').forEach(d => d.classList.remove('selected'));
+    button.classList.add('selected');
+  }
+
   PEN_COLORS.forEach(color => {
     const dot = document.createElement('button');
     dot.className = 'color-dot' + (color === currentColor ? ' selected' : '');
     dot.style.background = color;
     dot.addEventListener('click', () => {
       currentColor = color;
+      isErasing = false;
       ctx.strokeStyle = color;
-      palette.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-      dot.classList.add('selected');
+      selectTool(dot);
     });
     palette.appendChild(dot);
   });
+
+  // 지우개 버튼
+  const eraser = document.createElement('button');
+  eraser.className = 'eraser-dot';
+  eraser.textContent = '🧼';
+  eraser.title = '지우개';
+  eraser.addEventListener('click', () => {
+    isErasing = true;
+    selectTool(eraser);
+  });
+  palette.appendChild(eraser);
 })();
 
 // ===== 화면 크기 변경 대응 =====
