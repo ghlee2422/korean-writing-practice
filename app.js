@@ -99,10 +99,20 @@ const PEN_COLORS = [
 ];
 
 const ERASER_SIZES = [
-  { size: 15, preview: 10, label: '작게' },
-  { size: 30, preview: 18, label: '중간' },
-  { size: 55, preview: 28, label: '크게' }
+  { size: 15, iconW: 22, iconH: 15, label: '작게' },
+  { size: 30, iconW: 34, iconH: 23, label: '중간' },
+  { size: 55, iconW: 48, iconH: 32, label: '크게' }
 ];
+
+function eraserSvgMarkup() {
+  return `
+    <svg viewBox="0 0 40 28" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="36" height="14" fill="#FF6B9D" rx="2.5"/>
+      <rect x="2" y="13" width="36" height="13" fill="#F5E6D3"/>
+      <rect x="2" y="2" width="36" height="24" fill="none" stroke="#2D3436" stroke-width="1.8" rx="2.5"/>
+      <line x1="2" y1="13" x2="38" y2="13" stroke="#2D3436" stroke-width="1.2" opacity="0.6"/>
+    </svg>`;
+}
 
 // ===== DOM 요소 =====
 const screens = {
@@ -673,16 +683,15 @@ document.getElementById('back-to-select').addEventListener('click', () => {
   divider.className = 'palette-divider';
   palette.appendChild(divider);
 
-  // 지우개 버튼 3개 (작게/중간/크게)
-  ERASER_SIZES.forEach(({ size, preview, label }) => {
+  // 지우개 버튼 3개 (작게/중간/크게) - SVG 지우개 모양
+  ERASER_SIZES.forEach(({ size, iconW, iconH, label }) => {
     const eraser = document.createElement('button');
     eraser.className = 'eraser-dot';
     eraser.title = `지우개 (${label})`;
-    const inner = document.createElement('span');
-    inner.className = 'eraser-preview';
-    inner.style.width = preview + 'px';
-    inner.style.height = preview + 'px';
-    eraser.appendChild(inner);
+    eraser.innerHTML = eraserSvgMarkup();
+    const svg = eraser.querySelector('svg');
+    svg.setAttribute('width', iconW);
+    svg.setAttribute('height', iconH);
 
     eraser.addEventListener('click', () => {
       isErasing = true;
