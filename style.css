@@ -230,6 +230,34 @@ html, body {
   touch-action: none;
 }
 
+/* ===== 색상 팔레트 ===== */
+.color-palette {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.color-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid white;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  padding: 0;
+}
+
+.color-dot:active {
+  transform: scale(0.9);
+}
+
+.color-dot.selected {
+  border-color: #2D3436;
+  transform: scale(1.15);
+}
+
 /* ===== 컨트롤 버튼 ===== */
 .practice-controls {
   display: flex;

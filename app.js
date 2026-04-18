@@ -83,6 +83,12 @@ let currentIndex = 0;
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
+let currentColor = '#2D3436';
+
+const PEN_COLORS = [
+  '#2D3436', '#FF6B6B', '#FDCB6E', '#00B894',
+  '#0984E3', '#6C5CE7', '#E84393', '#E17055'
+];
 
 // ===== DOM 요소 =====
 const screens = {
@@ -235,7 +241,7 @@ function resizeCanvas() {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.lineWidth = 8;
-  ctx.strokeStyle = '#2D3436';
+  ctx.strokeStyle = currentColor;
 }
 
 function clearCanvas() {
@@ -246,7 +252,7 @@ function clearCanvas() {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.lineWidth = 8;
-  ctx.strokeStyle = '#2D3436';
+  ctx.strokeStyle = currentColor;
 }
 
 // ===== 레퍼런스 캔버스 (정확도 비교용) =====
@@ -605,6 +611,23 @@ document.getElementById('next-btn').addEventListener('click', () => {
 document.getElementById('back-to-select').addEventListener('click', () => {
   showScreen('select');
 });
+
+// ===== 색상 팔레트 생성 =====
+(function initColorPalette() {
+  const palette = document.getElementById('color-palette');
+  PEN_COLORS.forEach(color => {
+    const dot = document.createElement('button');
+    dot.className = 'color-dot' + (color === currentColor ? ' selected' : '');
+    dot.style.background = color;
+    dot.addEventListener('click', () => {
+      currentColor = color;
+      ctx.strokeStyle = color;
+      palette.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+      dot.classList.add('selected');
+    });
+    palette.appendChild(dot);
+  });
+})();
 
 // ===== 화면 크기 변경 대응 =====
 window.addEventListener('resize', () => {
